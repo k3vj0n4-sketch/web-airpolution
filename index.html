@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AeroCast — Monitoring Kualitas Udara Jakarta</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&amp;family=DM+Mono:wght@400;500&amp;family=Syne:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/tabler-icons.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<link href="styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="frame">
+<!-- ░ TOPBAR ░ -->
+<div class="topbar">
+<div class="topbar-brand">
+<div class="brand-icon">
+<svg fill="none" stroke="#22d3ee" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M5 8h8.5a2.5 2.5 0 1 0-2.34-3.35"></path>
+<path d="M3 12h15.5a2.5 2.5 0 1 1-2.34 3.35"></path>
+<path d="M4 16h5"></path>
+</svg>
+</div>
+<span class="brand-text">Aero<span>Cast</span></span>
+</div>
+<div class="topbar-right">
+<span class="topbar-meta">Jakarta · 2026</span>
+<div class="live-pill"><div class="live-dot"></div><span class="live-txt">Live Monitoring</span></div>
+<button aria-expanded="false" aria-label="Toggle navigation" class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileNav()">
+<svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20">
+<line x1="4" x2="20" y1="6" y2="6"></line>
+<line x1="4" x2="20" y1="12" y2="12"></line>
+<line x1="4" x2="20" y1="18" y2="18"></line>
+</svg>
+</button>
+</div>
+</div>
+<!-- ░ CMD+K MODAL ░ -->
+<div class="cmdk-overlay" id="cmdkOverlay" onclick="if(event.target===this)closeCmdK()">
+<div class="cmdk-modal">
+<div class="cmdk-input-wrap">
+<i class="ti ti-search"></i>
+<input autocomplete="off" class="cmdk-input" id="cmdkInput" placeholder="Cari section, stasiun, atau fitur…"/>
+<span class="cmdk-kbd">ESC</span>
+</div>
+<div class="cmdk-list" id="cmdkList"></div>
+<div class="cmdk-footer">
+<div class="cmdk-footer-hint"><kbd>↑↓</kbd> navigasi</div>
+<div class="cmdk-footer-hint"><kbd>↵</kbd> pilih</div>
+<div class="cmdk-footer-hint"><kbd>esc</kbd> tutup</div>
+</div>
+</div>
+</div>
+<!-- ░ MOBILE DRAWER ░ -->
+<div aria-label="Mobile navigation" class="mobile-drawer" id="mobileDrawer" role="navigation">
+<a class="md-item active" href="index.html"><i aria-hidden="true" class="ti ti-home"></i></a>
+<a class="md-item" href="dashboard.html"><i aria-hidden="true" class="ti ti-layout-dashboard"></i></a>
+<a class="md-item" href="analitik.html"><i aria-hidden="true" class="ti ti-chart-pie"></i></a>
+<a class="md-item" href="prediksi.html"><i aria-hidden="true" class="ti ti-cpu"></i></a>
+<a class="md-item" href="dataset.html"><i aria-hidden="true" class="ti ti-table"></i></a>
+<a class="md-item" href="about.html"><i aria-hidden="true" class="ti ti-users"></i></a>
+</div>
+<div class="layout">
+<!-- ░ SIDEBAR ░ -->
+<div class="sidebar">
+<!-- Station accordion (rendered by JS) -->
+<div class="station-accordion" id="stationAccordion"></div>
+<div class="sidebar-label">Menu</div>
+<a class="nav-item active" href="index.html">
+ Home
+      </a>
+<a class="nav-item" href="dashboard.html">
+ Dashboard AQI
+      </a>
+<a class="nav-item" href="analitik.html">
+ Analitik Tren
+      </a>
+<a class="nav-item" href="prediksi.html">
+ Prediksi SMA 
+</a>
+<a class="nav-item" href="dataset.html">
+ Dataset
+      </a>
+<div class="sidebar-divider"></div>
+<a class="nav-item" href="about.html">
+ About Us
+      </a>
+<div class="sidebar-footer">
+<div class="footer-dot"></div>
+<span class="footer-txt">5 stasiun aktif</span>
+</div>
+</div>
+<!-- ░ MAIN ░ -->
+<div class="main">
+<!-- ════════════════════════════════ HOME ══════ -->
+<div class="section active" id="sec-beranda">
+<!-- Ambient glows -->
+<div class="b-glow-1"></div>
+<div class="b-glow-2"></div>
+<!-- Particle canvas -->
+<canvas class="beranda-canvas" id="berandaCanvas"></canvas>
+<!-- Split hero -->
+<div class="beranda-split">
+<!-- Left: copy -->
+<div class="beranda-left">
+<div class="beranda-tag">
+<span class="beranda-tag-dot"></span>
+              Platform Monitoring Kualitas Udara · Jakarta 2026
+            </div>
+<h1 class="beranda-h1">Pantau Udara<br/><span class="beranda-h1-accent">Jakarta</span><br/>Real-time.</h1>
+<p class="beranda-desc">Analisis kualitas udara berbasis data ISPU dari 5 stasiun pemantauan DKI Jakarta — visualisasi interaktif, prediksi tren, dan insight mendalam.</p>
+<div class="beranda-actions">
+<button class="beranda-btn-primary" data-sec="dashboard">
+<i class="ti ti-layout-dashboard"></i>
+                Buka Dashboard
+              </button>
+<button class="beranda-btn-secondary" data-sec="prakiraan">
+<i class="ti ti-cpu"></i>
+                Lihat Prediksi
+              </button>
+</div>
+<div class="beranda-stations">
+<span class="bst-label">Stasiun:</span>
+<div class="bst-list">
+<div class="bst-item sedang"><span class="bst-dot"></span>DKI1</div>
+<div class="bst-item tidak-sehat"><span class="bst-dot"></span>DKI2</div>
+<div class="bst-item baik"><span class="bst-dot"></span>DKI3</div>
+<div class="bst-item sedang"><span class="bst-dot"></span>DKI4</div>
+<div class="bst-item tidak-sehat"><span class="bst-dot"></span>DKI5</div>
+</div>
+</div>
+</div>
+<!-- Right: AQI orb -->
+<div class="beranda-right">
+<div class="aqi-orb-wrap">
+<div class="aqi-orb-ring ring-1"></div>
+<div class="aqi-orb-ring ring-2"></div>
+<div class="aqi-orb-ring ring-3"></div>
+<div class="aqi-orb-core">
+<div class="aqi-orb-label">AQI Jakarta</div>
+<div class="aqi-orb-value">SEDANG</div>
+<div class="aqi-orb-sub">PM10 · 142 µg/m³</div>
+</div>
+<div class="aqi-float aqi-float-1">PM10 <span>142</span></div>
+<div class="aqi-float aqi-float-2">O₃ <span>87</span></div>
+<div class="aqi-float aqi-float-3">NO₂ <span>45</span></div>
+<div class="aqi-float aqi-float-4">SO₂ <span>23</span></div>
+</div>
+</div>
+</div>
+<!-- Stats strip -->
+<div class="beranda-stats-strip">
+<div class="bss-item">
+<div class="bss-num"><span class="count-up" data-target="155">0</span></div>
+<div class="bss-label">Data Tercatat</div>
+</div>
+<div class="bss-item">
+<div class="bss-num">5</div>
+<div class="bss-label">Stasiun BMKG</div>
+</div>
+<div class="bss-item">
+<div class="bss-num"><span class="count-up" data-target="366">0</span></div>
+<div class="bss-label">Hari Dipantau</div>
+</div>
+<div class="bss-item">
+<div class="bss-num">2026</div>
+<div class="bss-label">Tahun Dataset</div>
+</div>
+</div>
+<!-- Feature cards -->
+<div class="beranda-features">
+<div class="bf-card" data-sec="dashboard">
+<div class="bf-icon" style="background:rgba(34,211,238,0.08);color:var(--cyan)">
+<svg fill="none" height="17" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="17"><rect height="7" rx="1" width="7" x="3" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="14"></rect><rect height="7" rx="1" width="7" x="3" y="14"></rect></svg>
+</div>
+<div class="bf-content">
+<div class="bf-title">Dashboard AQI</div>
+<div class="bf-desc">Visualisasi real-time kondisi kualitas udara per stasiun dengan grafik tren polutan PM10, O3, CO, NO2, dan SO2.</div>
+</div>
+<i class="ti ti-arrow-right bf-arrow"></i>
+</div>
+<div class="bf-card" data-sec="prakiraan">
+<div class="bf-icon" style="background:rgba(167,139,250,0.08);color:var(--purple)">
+<svg fill="none" height="17" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="17"><rect height="16" rx="2" width="16" x="4" y="4"></rect><path d="M9 9h1v6H9z"></path><path d="M14 9h1v6h-1z"></path><path d="M7 7v1M17 7v1M7 16v1M17 16v1"></path></svg>
+</div>
+<div class="bf-content">
+<div class="bf-title">Prediksi SMA</div>
+<div class="bf-desc">Model prediksi berbasis Simple Moving Average untuk memproyeksikan tren kualitas udara 7 hari ke depan.</div>
+</div>
+<i class="ti ti-arrow-right bf-arrow"></i>
+</div>
+<div class="bf-card" data-sec="analitik">
+<div class="bf-icon" style="background:rgba(52,211,153,0.08);color:var(--green)">
+<svg fill="none" height="17" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="17"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+</div>
+<div class="bf-content">
+<div class="bf-title">Analitik Tren</div>
+<div class="bf-desc">Analisis mendalam distribusi kategori AQI antar stasiun, perbandingan polutan, dan pola sepanjang tahun.</div>
+</div>
+<i class="ti ti-arrow-right bf-arrow"></i>
+</div>
+</div>
+<!-- Panduan AQI Section -->
+<div class="beranda-panduan">
+<div class="beranda-panduan-header">
+<h2 class="beranda-panduan-title">Panduan Kategori ISPU</h2>
+<p class="beranda-panduan-subtitle">Memahami tingkat kualitas udara dan dampaknya terhadap kesehatan</p>
+</div>
+<div class="panduan-grid">
+<div class="panduan-card pc-baik">
+<div class="pc-icon-wrap">
+<svg fill="none" height="26" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="26"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 11 15 16 9"></polyline></svg>
+</div>
+<div class="pc-range-num">ISPU 0 – 50</div>
+<div class="pc-title">Baik</div>
+<div class="pc-desc">Kualitas udara memuaskan, tidak ada risiko kesehatan yang berarti bagi mayoritas orang.</div>
+</div>
+<div class="panduan-card pc-sedang">
+<div class="pc-icon-wrap">
+<svg fill="none" height="26" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="26"><circle cx="12" cy="12" r="10"></circle><line x1="8" x2="16" y1="12" y2="12"></line></svg>
+</div>
+<div class="pc-range-num">ISPU 51 – 100</div>
+<div class="pc-title">Sedang</div>
+<div class="pc-desc">Kualitas udara dapat diterima. Kelompok sangat sensitif mungkin merasakan sedikit dampak.</div>
+</div>
+<div class="panduan-card pc-ts">
+<div class="pc-icon-wrap">
+<svg fill="none" height="26" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="26"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path><line x1="8" x2="16" y1="16" y2="24"></line><line x1="16" x2="8" y1="16" y2="24"></line></svg>
+</div>
+<div class="pc-range-num">ISPU 101 – 199</div>
+<div class="pc-title">Tidak Sehat</div>
+<div class="pc-desc">Kelompok rentan (lansia, anak-anak, penderita asma) dianjurkan mengurangi aktivitas luar ruangan.</div>
+</div>
+<div class="panduan-card pc-sts">
+<div class="pc-icon-wrap">
+<svg fill="none" height="26" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="26"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" x2="12" y1="9" y2="13"></line><line x1="12" x2="12.01" y1="17" y2="17"></line></svg>
+</div>
+<div class="pc-range-num">ISPU 200 – 299</div>
+<div class="pc-title">Sangat Tidak Sehat</div>
+<div class="pc-desc">Semua orang berisiko mengalami dampak kesehatan. Disarankan tetap di dalam ruangan.</div>
+</div>
+<div class="panduan-card pc-bahaya">
+<div class="pc-icon-wrap">
+<svg fill="none" height="26" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="26"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+</div>
+<div class="pc-range-num">ISPU ≥ 300</div>
+<div class="pc-title">Berbahaya</div>
+<div class="pc-desc">Darurat kesehatan — seluruh populasi berisiko parah. Hindari semua aktivitas luar ruangan.</div>
+</div>
+</div>
+</div>
+<!-- Scrolling data ticker -->
+<div class="beranda-ticker">
+<div class="ticker-track">
+<span>PM10 DKI1: <strong>142</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>O₃ DKI2: <strong>92</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>Status Jakarta: <strong>SEDANG</strong></span><span class="ticker-sep">·</span>
+<span>CO DKI3: <strong>8</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>NO₂ DKI4: <strong>38</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>PM10 DKI5: <strong>168</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>SO₂ DKI1: <strong>23</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>Hari Baik 2026: <strong>34</strong> dari 366</span><span class="ticker-sep">·</span>
+<span>Hari Berbahaya: <strong>2</strong> hari</span><span class="ticker-sep">·</span>
+<!-- duplicate for seamless loop -->
+<span>PM10 DKI1: <strong>142</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>O₃ DKI2: <strong>92</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>Status Jakarta: <strong>SEDANG</strong></span><span class="ticker-sep">·</span>
+<span>CO DKI3: <strong>8</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>NO₂ DKI4: <strong>38</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>PM10 DKI5: <strong>168</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>SO₂ DKI1: <strong>23</strong> µg/m³</span><span class="ticker-sep">·</span>
+<span>Hari Baik 2026: <strong>34</strong> dari 366</span><span class="ticker-sep">·</span>
+<span>Hari Berbahaya: <strong>2</strong> hari</span><span class="ticker-sep">·</span>
+</div>
+</div>
+</div>
+<!-- ─────────────────────────────── /home ─── -->
+<!-- ════════════════════════════════ DASHBOARD ════ -->
+
+<!-- ──────────────────────────────── /dashboard ─── -->
+<!-- ════════════════════════════════ ANALITIK ═════ -->
+
+<!-- ─────────────────────────────── /analitik ─── -->
+<!-- ════════════════════════════════ PRAKIRAAN ════ -->
+
+<!-- ──────────────────────────────── /prakiraan ─── -->
+<!-- ════════════════════════════════ DATASET ══════ -->
+
+<!-- ──────────────────────────────── /dataset ─── -->
+<!-- ════════════════════════════════ ABOUT US ══════ -->
+
+<!-- ─────────────────────────────── /about us ─── -->
+</div><!-- /main -->
+</div><!-- /layout -->
+</div><!-- /frame -->
+<script src="app.js"></script>
+</body>
+</html>
